@@ -45,14 +45,14 @@ spec:
             - name: metrics
               containerPort: {{ .Values.mktxp.port }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: metrics
-          readinessProbe:
-            httpGet:
-              path: /
-              port: metrics
+          livenessProbe: null
+            # httpGet:
+            #   path: /
+            #   port: metrics
+          readinessProbe: null
+            # httpGet:
+            #   path: /
+            #   port: metrics
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
