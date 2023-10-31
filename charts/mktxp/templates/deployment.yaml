@@ -39,7 +39,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           volumeMounts:
             - name: config
-              mountPath: /root/mktxp
+              mountPath: /home/mktxp/mktxp
               readOnly: true
           ports:
             - name: metrics
