@@ -30,7 +30,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: mktxp-config
+            name: {{ include "mktxp.fullname" . }}-conf
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
