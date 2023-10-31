@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mktxp.fullname" . }}
+  labels:
+    {{- include "mktxp.labels" . | nindent 4 }}
+data:
+  _mktxp.conf: |
+    [MKTXP]
+        port = {{ .Values.mktxp.port }}
+        socket_timeout = {{ .Values.mktxp.socketTimeout }}
+        
+        initial_delay_on_failure = {{ .Values.mktxp.scraping.initialDelayOnFailure }}
+        max_delay_on_failure = {{ .Values.mktxp.scraping.maximumDelayOnFailure }}
+        delay_inc_div = {{ .Values.mktxp.scraping.delayIncrementDivision }}
+
+        bandwidth = {{ .Values.mktxp.bandwidth.enable }}                # Turns metrics bandwidth metrics collection on / off    
+        bandwidth_test_interval = {{ .Values.mktxp.bandwidth.collectionInterval }}   # Interval for colllecting bandwidth metrics
+        minimal_collect_interval = {{ .Values.mktxp.scraping.minimumCollectionInterval }}    # Minimal metric collection interval
+
+        verbose_mode = {{ .Values.mktxp.logging.verbose }}            # Set it on for troubleshooting
+
+        fetch_routers_in_parallel = {{ .Values.mktxp.performance.threading.enable }}   # Set to True if you want to fetch multiple routers parallel
+        max_worker_threads = {{ .Values.mktxp.performance.threading.maxThreads }}              # Max number of worker threads that can fetch routers. Meaningless if fetch_routers_in_parallel is set to False
+        
+        max_scrape_duration = {{ .Values.mktxp.scraping.maxSingleRouterScrapeDuration }}            # Max duration of individual routers' metrics collection 
+        total_max_scrape_duration = {{ .Values.mktxp.scraping.maxAllRouterScrapeDuration }}      # Max overall duration of all metrics collection 
+  mktxp.conf: |
+    {{- range .Values.mktxp.targets }}
+    [{{ .name }}]
+        enabled = {{ .connection.enabled }}
+        hostname = {{ .connection.hostname }}
+        port = {{ .connection.port }}
+        username = {{ .authentication.username }}
+        password = {{ .authentication.password }}
+        use_ssl = {{ .authentication.ssl.enabled }}
+        no_ssl_certificate = {{ .authentication.ssl.forceSSL }}
+        ssl_certificate_verify = {{ not .authentication.ssl.noVerify }}
+
+        installed_packages = True       # Installed packages
+        dhcp = True                     # DHCP general metrics
+        dhcp_lease = True               # DHCP lease metrics
+
+        connections = True              # IP connections metrics
+        connection_stats = False        # Open IP connections metrics 
+
+        pool = True                     # Pool metrics
+        interface = True                # Interfaces traffic metrics
+        
+        firewall = True                 # IPv4 Firewall rules traffic metrics
+        ipv6_firewall = False           # IPv6 Firewall rules traffic metrics
+        ipv6_neighbor = False           # Reachable IPv6 Neighbors
+
+        poe = True                      # POE metrics
+        monitor = True                  # Interface monitor metrics
+        netwatch = True                 # Netwatch metrics
+        public_ip = True                # Public IP metrics
+        route = True                    # Routes metrics
+        wireless = True                 # WLAN general metrics
+        wireless_clients = True         # WLAN clients metrics
+        capsman = True                  # CAPsMAN general metrics
+        capsman_clients = True          # CAPsMAN clients metrics    
+
+        user = True                     # Active Users metrics
+        queue = True                    # Queues metrics
+        
+        remote_dhcp_entry = None        # An MKTXP entry for remote DHCP info resolution (capsman/wireless)
+
+        use_comments_over_names = True  # when available, forces using comments over the interfaces names
+
+        check_for_updates = False       # check for available ROS updates
+        {{- end }}
